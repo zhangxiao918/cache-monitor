@@ -81,11 +81,9 @@ public class LauncherActivity extends BaseActivity {
                 Collections.sort(list, new Comparator<CacheStatus>() {
                     @Override
                     public int compare(CacheStatus lhs, CacheStatus rhs) {
-                        // return lhs.getName().compareTo(rhs.getName());
-                        return lhs.getValue().compareTo(rhs.getValue());
+                        return lhs.getName().compareTo(rhs.getName());
                     }
                 });
-                removeDialog(LOADING_CACHE_PARAMS);
                 for (CacheStatus stats : list) {
                     String content = null;
                     content = stats.getName().toUpperCase(Locale.CHINA) + " : " + stats.getValue()
@@ -93,6 +91,7 @@ public class LauncherActivity extends BaseActivity {
                     String oldTxt = contentTextView.getText().toString();
                     contentTextView.setText(oldTxt + content);
                 }
+                removeDialog(LOADING_CACHE_PARAMS);
                 mHandler.postDelayed(this, 2 * 60 * 1000L);
                 mHandler.post(mStaffRunnable);
             }
