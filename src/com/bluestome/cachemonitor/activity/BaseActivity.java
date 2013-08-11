@@ -7,23 +7,24 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.StrictMode;
-import android.util.Log;
 
+import com.bluestome.android.activity.IActivityInitialization;
+import com.bluestome.android.activity.IBaseActivity;
 import com.bluestome.android.cache.MemcacheClient;
 import com.bluestome.android.widget.TipDialog;
 
 import java.lang.ref.WeakReference;
 
-public abstract class BaseActivity extends Activity implements IBaseActivity {
+public abstract class BaseActivity extends Activity implements IBaseActivity,
+        IActivityInitialization {
 
     private final String TAG = BaseActivity.class.getCanonicalName();
     protected MemcacheClient mCacheClient;
 
-    protected static class MyHandler extends Handler {
+    protected class MyHandler extends Handler {
         private WeakReference<BaseActivity> mActivity;
 
-        MyHandler(BaseActivity activity) {
+        private MyHandler(BaseActivity activity) {
             mActivity = new WeakReference<BaseActivity>(activity);
         }
 
@@ -42,9 +43,17 @@ public abstract class BaseActivity extends Activity implements IBaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        pre();
+        init();
+        registerDestorySelfBroadcast();
         showDialog(CACHE_INITING);
         mHandler.post(initCacheRunnable);
+    }
+
+    @Override
+    protected void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+        unRegisterDestorySelfBroadcast();
     }
 
     final int LOADING = 1000;
@@ -77,23 +86,19 @@ public abstract class BaseActivity extends Activity implements IBaseActivity {
         public void run() {
             if (null == mCacheClient) {
                 mCacheClient = MemcacheClient.getInstance(getContext());
-                mHandler.postDelayed(this, 1 * 1000L);
+                mHandler.postDelayed(this, mCacheClient.getSocketConnectTO() * 1000L);
             } else {
                 removeDialog(CACHE_INITING);
-                Log.d(TAG, "mCacheClient init success!");
-                mHandler.removeCallbacks(this);
+                mHandler.removeCallbacks(initCacheRunnable);
+                next();
             }
         }
     };
 
-    private void pre() { // 详见StrictMode文档
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectDiskReads()
-                .detectDiskWrites()
-                .detectNetwork() // or .detectAll() for all detectable problems
-                .penaltyLog()
-                .build());
-    }
+    /**
+     * 下一步
+     */
+    public abstract void next();
 
     /**
      * 初始化
@@ -103,12 +108,22 @@ public abstract class BaseActivity extends Activity implements IBaseActivity {
     /**
      * 初始化视图
      */
-    public abstract void initView();
+    public abstract void initViews();
 
     /**
      * 舒适化数据
      */
-    public abstract void initData();
+    public abstract void initDatas();
+
+    /**
+     * 注册接收销毁当前ACTIVITY的广播
+     */
+    public abstract void registerDestorySelfBroadcast();
+
+    /**
+     * 反注册销毁当前ACTIVITY的广播
+     */
+    public abstract void unRegisterDestorySelfBroadcast();
 
     @Override
     public Context getContext() {

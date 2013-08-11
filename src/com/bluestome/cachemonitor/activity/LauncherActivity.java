@@ -3,6 +3,8 @@ package com.bluestome.cachemonitor.activity;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.StrictMode;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -35,8 +37,7 @@ public class LauncherActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initView();
-        initData();
+        initViews();
     }
 
     @Override
@@ -47,6 +48,15 @@ public class LauncherActivity extends BaseActivity {
 
     @Override
     public void init() {
+        Log.e(TAG, "设置网络连接信息");
+        // 详见StrictMode文档
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectDiskReads()
+                .detectDiskWrites()
+                .detectNetwork() // or .detectAll() for all detectable problems
+                .penaltyLog()
+                .build());
+
     }
 
     /**
@@ -115,14 +125,14 @@ public class LauncherActivity extends BaseActivity {
     };
 
     @Override
-    public void initView() {
+    public void initViews() {
         setContentView(R.layout.activity_launch);
         contentTextView = (TextView) findViewById(R.id.content_id);
         contentTextView.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void initData() {
+    public void initDatas() {
         mHandler.postDelayed(mStaffRunnable, 5 * 1000L);
         mHandler.postDelayed(mGetCacheStats, 3 * 1000L);
     }
@@ -133,6 +143,24 @@ public class LauncherActivity extends BaseActivity {
         mHandler.removeCallbacks(mGetCacheStats);
         mHandler.removeCallbacks(mStaffRunnable);
         finish();
+    }
+
+    @Override
+    public void registerDestorySelfBroadcast() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void unRegisterDestorySelfBroadcast() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void next() {
+        // TODO Auto-generated method stub
+        initDatas();
     }
 
 }
