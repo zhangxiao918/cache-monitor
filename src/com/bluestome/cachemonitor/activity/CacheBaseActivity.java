@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.bluestome.android.activity.BaseActivity;
 import com.bluestome.android.activity.IActivityInitialization;
-import com.bluestome.android.cache.MemcacheClient;
+import com.bluestome.android.cache.memcache.MemcacheClient;
 import com.bluestome.android.widget.TipDialog;
 
 public abstract class CacheBaseActivity extends BaseActivity implements IActivityInitialization {
