@@ -6,10 +6,12 @@ import android.os.Bundle;
 
 import com.bluestome.android.activity.BaseActivity;
 import com.bluestome.android.activity.IActivityInitialization;
+import com.bluestome.android.activity.IBroadcasts;
 import com.bluestome.android.cache.memcache.MemcacheClient;
 import com.bluestome.android.widget.TipDialog;
 
-public abstract class CacheBaseActivity extends BaseActivity implements IActivityInitialization {
+public abstract class CacheBaseActivity extends BaseActivity implements IActivityInitialization,
+        IBroadcasts {
 
     private final String TAG = CacheBaseActivity.class.getCanonicalName();
     protected MemcacheClient mCacheClient;
@@ -19,6 +21,7 @@ public abstract class CacheBaseActivity extends BaseActivity implements IActivit
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         init();
+        registerBroadcasts();
         showDialog(CACHE_INITING);
         mHandler.post(initCacheRunnable);
     }
@@ -42,6 +45,31 @@ public abstract class CacheBaseActivity extends BaseActivity implements IActivit
                 return dialog;
         }
         return super.onCreateDialog(id);
+    }
+
+    @Override
+    public void registerBroadcasts() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void unRegisterBroadcasts() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void initNetworks() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+        unRegisterBroadcasts();
     }
 
     /**
